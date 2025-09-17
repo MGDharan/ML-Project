@@ -1,0 +1,4 @@
+--- Text Summarization ---
+ Professionals, researchers, and students deal with long documents (100+ pages) Existing tools often fail with large PDFs or produce generic summaries . Build a system that can ingest multiple PDFs (or one large one) Automatically extract important sentences, keywords, and insights . Condense hundreds of pages into 2–10 concise pages .
+ Users include lawyers, legal teams and general users . Summarize ebooks, articles, or notes . Handles large documents (100+ pages) - Works with single or multiple PDFs . Uses AI models (Hugging Face BART / Gemini API)
+ fi ensures context-aware, human-like summaries . Saves time: hours of reading and minutes of scanning . Flexible: usable across education, business, law, research . Scalable: can be extended into a web or mobile app .
