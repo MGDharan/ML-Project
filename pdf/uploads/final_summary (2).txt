@@ -1,0 +1,5 @@
+--- Text Summarization ---
+ GIRIDHARAN M K.S. is passionate about creating accessible AI-powered tools that solve real-world problems . Successfully completed an internship in the AI/ML domain, where he built impactful solutions like a sign language recognition system and a smart shop assistant .
+ Developed three fully functional AI-based applications: Hand Sign Detection System using Mediapipe and CNN Shop AI Assistant that recommends which dresses to stock/promote using sales prediction . Used n8n to automate workflows, build AI agents, and manage GitHub automation pipelines .
+ K.S. Rangasamy Gharan is a student at a college in India . He studied sign language, AI, ML, and automation at a high school . He created a CNN on extracted hand landmarks to identify letters from webcam input .
+ in n8n Analyzes past sales data and suggests which dress categories to promote on specific days or months (e.g., November) Helps store owners make stock decisions using predictive analytics . Food Recommendation App Based on Weather & Time: Tech Stack: Python, WeatherAPI, LocationIQ, Pushbullet, Twilio .

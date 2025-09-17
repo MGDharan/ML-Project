@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Document Processor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(120deg, #e0eafc, #cfdef3 100%);
+            min-height: 100vh;
+        }
+        .main-flex {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            gap: 2rem;
+        }
+        .side-ai {
+            flex: 1 1 0;
+            max-width: 300px;
+            background: #f7fafc;
+            border-radius: 18px;
+            margin-top: 48px;
+            padding: 2rem 1.2rem;
+            box-shadow: 0 4px 16px rgba(60, 60, 120, 0.07);
+            color: #2d3a4a;
+        }
+        .container {
+            background: #fff;
+            padding: 2.5rem 2rem 2rem 2rem;
+            border-radius: 18px;
+            max-width: 480px;
+            margin: 48px auto;
+            box-shadow: 0 8px 32px rgba(60, 60, 120, 0.15);
+        }
+        h2 {
+            text-align: center;
+            color: #2d3a4a;
+            margin-bottom: 1.5rem;
+        }
+        label {
+            font-weight: 500;
+            color: #2d3a4a;
+            margin-top: 1rem;
+            display: block;
+        }
+        input[type="file"], input[type="text"], select {
+            width: 100%;
+            padding: 0.7rem;
+            margin-top: 0.3rem;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #f7fafc;
+        }
+        .ai-options {
+            margin: 0.5rem 0 1.2rem 0;
+            padding: 0.8rem 1rem;
+            background: #f4f8fb;
+            border-radius: 8px;
+            border: 1px solid #e3eaf2;
+        }
+        .ai-options label {
+            display: flex;
+            align-items: center;
+            font-weight: 400;
+            margin: 0.2rem 0;
+            color: #34495e;
+        }
+        .ai-options input[type="checkbox"] {
+            margin-right: 0.7em;
+        }
+        button {
+            width: 100%;
+            background: linear-gradient(90deg, #4f8cff, #38b6ff);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.9rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #38b6ff, #4f8cff);
+        }
+        .desc {
+            text-align: center;
+            color: #6c7a89;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        .result-box {
+            background: #f4f8fb;
+            border-radius: 10px;
+            border: 1px solid #e3eaf2;
+            padding: 1.2rem 1rem;
+            margin-top: 2rem;
+            white-space: pre-wrap;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            color: #2d3a4a;
+            font-size: 1.05rem;
+        }
+        .download-link {
+            display: block;
+            margin: 1.2rem auto 0 auto;
+            text-align: center;
+            background: #38b6ff;
+            color: #fff;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            width: fit-content;
+            transition: background 0.2s;
+        }
+        .download-link:hover {
+            background: #4f8cff;
+        }
+        .error {
+            color: #c0392b;
+            background: #ffeaea;
+            border: 1px solid #ffb3b3;
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="main-flex">
+    <div class="side-ai">
+        <h3>AI Features</h3>
+        <ul>
+            <li>Text Summarization</li>
+            <li>Sentiment Analysis</li>
+            <li>Chatbot Integration</li>
+            <li>Document Classification</li>
+            <li>Language Translation</li>
+        </ul>
+        <p style="margin-top:2rem;font-size:0.97rem;">Empower your documents with the latest in AI. Select your tools and get instant results!</p>
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="AI" style="width:100%;max-width:180px;display:block;margin:1.5rem auto 0 auto;opacity:0.85;">
+    </div>
+    <div class="container">
+        <h2>AI Document Processor</h2>
+        <div class="desc">
+            Upload a PDF, select the AI tools you want, and get instant results in your chosen format.
+        </div>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            <label for="pdf">Upload PDF:</label>
+            <input type="file" name="pdf" accept="application/pdf" required>
+
+            <label for="language">Translate summary to (optional):</label>
+            <input type="text" name="language" placeholder="e.g., Tamil">
+
+            <div class="ai-options">
+                <strong>AI Tools:</strong><br>
+                <label><input type="checkbox" name="ai_tools" value="summarization" checked> Text Summarization</label>
+                <label><input type="checkbox" name="ai_tools" value="sentiment"> Sentiment Analysis</label>
+                <label><input type="checkbox" name="ai_tools" value="chatbot"> Chatbot Integration</label>
+                <label><input type="checkbox" name="ai_tools" value="classification"> Document Classification</label>
+            </div>
+
+            <label for="output_type">Output Format:</label>
+            <select name="output_type">
+                <option value="pdf">PDF</option>
+                <option value="txt">TXT</option>
+                <option value="doc">DOCX</option>
+                <option value="html">HTML</option>
+                <option value="csv">CSV</option>
+            </select>
+
+            <button type="submit">Process Document</button>
+        </form>
+        {% if ai_result %}
+            <div class="result-box">
+                <strong>AI Result:</strong><br><br>
+                {{ ai_result }}
+            </div>
+        {% endif %}
+        {% if download_link %}
+            <a class="download-link" href="{{ download_link }}">Download Result</a>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
