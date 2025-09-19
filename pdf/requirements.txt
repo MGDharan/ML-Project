@@ -40,4 +40,14 @@ python-docx
 pdf2image
 pytesseract
 reportlab
+streamlit==1.49.1
+pdfplumber
+pandas
+numpy
+transformers>=4.44.2
+torch>=2.8.0
+python-docx
+pdf2image
+pytesseract
+reportlab
 
