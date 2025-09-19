@@ -29,13 +29,13 @@ if "user_id" not in st.session_state:
         """, unsafe_allow_html=True)
         st.markdown('<div class="login-title">🔒 Welcome to AI Document Processor</div>', unsafe_allow_html=True)
         st.markdown('<div class="login-desc">Upload PDFs and get instant AI-powered summaries, sentiment, classification, and more. Your history is private and secure. Try our new chat and Q&A features!</div>', unsafe_allow_html=True)
+        # --- Real-time clock (no threading) ---
+        import time
         clock_placeholder = st.empty()
-        def update_clock():
-            while True:
-                clock_placeholder.markdown(f'<div class="clock">🕒 {time.strftime("%Y-%m-%d %H:%M:%S")}</div>', unsafe_allow_html=True)
-                time.sleep(1)
-        import threading
-        threading.Thread(target=update_clock, daemon=True).start()
+        clock_placeholder.markdown(
+            f'<div class="clock">🕒 {time.strftime("%Y-%m-%d %H:%M:%S")}</div>',
+            unsafe_allow_html=True
+        )
         login_name = st.text_input("Name")
         login_password = st.text_input("Password", type="password")
         if st.button("Login"):
