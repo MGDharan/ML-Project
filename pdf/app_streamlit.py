@@ -46,8 +46,8 @@ def extract_text_from_pdf(pdf_file):
         st.warning(f"[Error using pdfplumber: {e}]")
     if not all_text.strip():
         st.info("No selectable text found. Running OCR...")
-        poppler_path = os.path.join(os.path.dirname(__file__), "uploads", "poppler", "bin")
-        images = convert_from_path(tmp_path, poppler_path=poppler_path)
+        # On Streamlit Cloud, poppler_path is not needed; system poppler is installed via packages.txt
+        images = convert_from_path(tmp_path)
         for img in images:
             text = pytesseract.image_to_string(img, lang="eng")
             all_text += text + "\n"
@@ -130,6 +130,11 @@ def log_user_request(ai_tools, output_type, page_count):
 
 def load_history():
     if not os.path.exists(HISTORY_CSV):
+        # Auto-create the file with a header if missing
+        with open(HISTORY_CSV, mode="w", encoding="utf-8", newline='') as f:
+            writer = csv.writer(f)
+            # Optionally add a header row, or leave empty for compatibility
+            # writer.writerow(["Timestamp", "AI Tools", "Output Type", "Page Count"])
         return []
     with open(HISTORY_CSV, mode="r", encoding="utf-8") as f:
         reader = csv.reader(f)
