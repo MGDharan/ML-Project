@@ -56,7 +56,8 @@ def login():
 
     if user:
         session['user_id'] = user[0]
-        session['last_interaction'] = datetime.now()
+        # Store last_interaction as ISO string
+        session['last_interaction'] = datetime.now().isoformat()
         return jsonify({'message': 'Login successful', 'user_id': user[0]}), 200
     else:
         return jsonify({'error': 'Invalid credentials'}), 401
@@ -90,12 +91,19 @@ def logout():
 def session_timeout():
     if 'user_id' in session:
         if 'last_interaction' in session:
-            last_interaction = session['last_interaction']
-            if datetime.now() - last_interaction > timedelta(minutes=2):
+            try:
+                last_interaction = datetime.fromisoformat(session['last_interaction'])
+                if datetime.now() - last_interaction > timedelta(minutes=2):
+                    session.pop('user_id', None)
+                    session.pop('last_interaction', None)
+                    return jsonify({'error': 'Session timed out'}), 401
+            except Exception:
+                # If parsing fails, force logout
                 session.pop('user_id', None)
                 session.pop('last_interaction', None)
-                return jsonify({'error': 'Session timed out'}), 401
-        session['last_interaction'] = datetime.now()
+                return jsonify({'error': 'Session error'}), 401
+        # Always update last_interaction as ISO string
+        session['last_interaction'] = datetime.now().isoformat()
 
 if __name__ == '__main__':
     init_db()
