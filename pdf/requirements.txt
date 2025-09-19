@@ -8,3 +8,5 @@ python-docx
 pdf2image
 pytesseract
 reportlab
+torch==2.2.2
+transformers==4.44.2
