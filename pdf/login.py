@@ -22,6 +22,10 @@ def init_db():
                         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY(user_id) REFERENCES users(id)
                     )''')
+    # Add default user if not exists
+    cursor.execute('SELECT id FROM users WHERE name = ?', ('giridharan',))
+    if cursor.fetchone() is None:
+        cursor.execute('INSERT INTO users (name, password) VALUES (?, ?)', ('giridharan', '123'))
     conn.commit()
     conn.close()
 
