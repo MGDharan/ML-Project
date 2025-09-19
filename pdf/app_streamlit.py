@@ -63,7 +63,7 @@ def split_text(text, max_words=400):
 
 
 def summarize_text(chunks, pages=1):
-    summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+    summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=-1)
     summaries = []
     # Adjust max_length based on pages (roughly 200 tokens per page)
     max_length = 200 * pages
@@ -72,7 +72,7 @@ def summarize_text(chunks, pages=1):
             summary = summarizer(
                 chunk,
                 max_length=max_length,
-                min_length=50*pages,
+                min_length=50 * pages,
                 do_sample=False
             )[0]['summary_text']
             summaries.append(summary)
@@ -165,7 +165,7 @@ if pdf_file:
             result_sections.append("--- Text Summarization ---\n" + summary)
 
         if "Sentiment Analysis" in ai_tools:
-            sentiment_analyzer = pipeline("sentiment-analysis")
+            sentiment_analyzer = pipeline("sentiment-analysis", device=-1)
             sentiment = sentiment_analyzer(summary)[0]
             sentiment_str = f"Label: {sentiment['label']}, Score: {sentiment['score']:.2f}"
             result_sections.append("--- Sentiment Analysis ---\n" + sentiment_str)
@@ -175,7 +175,7 @@ if pdf_file:
             result_sections.append("--- Chatbot Integration ---\n" + chatbot_response)
 
         if "Document Classification" in ai_tools:
-            classifier = pipeline("zero-shot-classification")
+            classifier = pipeline("zero-shot-classification", device=-1)
             candidate_labels = ["business", "education", "health", "technology", "finance", "other"]
             classification = classifier(summary, candidate_labels)
             top_label = classification['labels'][0]
@@ -203,6 +203,7 @@ if pdf_file:
                 mime=None
             )
         os.remove(file_path)
+
         log_user_request(ai_tools, output_type, page_count)
 
 
@@ -221,7 +222,11 @@ with col2:
         import re
         from collections import Counter
         words = re.findall(r'\w+', text.lower())
-        stopwords = set(['the','and','is','in','to','of','a','for','on','with','as','by','at','an','be','are','from','that','this','it','or','was','but','not','have','has','had','which','you','we','they','their','our','can','will','would','should','could'])
+        stopwords = set([
+            'the','and','is','in','to','of','a','for','on','with','as','by','at','an','be','are',
+            'from','that','this','it','or','was','but','not','have','has','had','which','you','we',
+            'they','their','our','can','will','would','should','could'
+        ])
         keywords = [w for w in words if w not in stopwords and len(w) > 3]
         top_keywords = Counter(keywords).most_common(10)
         st.write("Top Keywords:", ', '.join([k for k, v in top_keywords]))
@@ -229,7 +234,7 @@ with col2:
     st.markdown("2. Named Entity Recognition (NER): Finds names, places, organizations, etc.")
     if pdf_file:
         try:
-            ner_pipe = pipeline("ner", grouped_entities=True)
+            ner_pipe = pipeline("ner", grouped_entities=True, device=-1)
             ner_results = ner_pipe(text[:1000])  # limit for speed
             ents = [(ent['word'], ent['entity_group']) for ent in ner_results]
             if ents:
@@ -251,7 +256,7 @@ with col2:
     st.markdown("4. Text Summarization (Alternative Model): Try T5 model for a different summary.")
     if pdf_file:
         try:
-            t5_summarizer = pipeline("summarization", model="t5-small")
+            t5_summarizer = pipeline("summarization", model="t5-small", device=-1)
             t5_summary = t5_summarizer(text[:1000], max_length=120, min_length=30, do_sample=False)[0]['summary_text']
             st.write("T5 Summary:", t5_summary)
         except Exception as e:
@@ -268,7 +273,6 @@ st.sidebar.subheader("History")
 history = load_history()
 history_options = [f"{i+1}. {row[0]} | {row[1]} | {row[2]} | {row[3]} page(s)" for i, row in enumerate(history)]
 selected_history = st.sidebar.selectbox("Select a history entry to view:", ["-"] + history_options)
-
 selected_history_data = None
 if selected_history != "-":
     idx = history_options.index(selected_history)
