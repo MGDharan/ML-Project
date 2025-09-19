@@ -39,7 +39,7 @@ if "user_id" not in st.session_state:
         login_name = st.text_input("Name")
         login_password = st.text_input("Password", type="password")
         if st.button("Login"):
-            response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": login_name, "password": login_password})
+            response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": giridharan, "password":yourpassword})
             if response.status_code == 200:
                 st.success("Login successful!")
                 user_id = response.json().get("user_id")
