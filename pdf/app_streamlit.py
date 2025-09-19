@@ -39,7 +39,7 @@ if "user_id" not in st.session_state:
         login_name = st.text_input("Name")
         login_password = st.text_input("Password", type="password")
         if st.button("Login"):
-            response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": giridharan, "password":yourpassword})
+            response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": login_name, "password": login_password})
             if response.status_code == 200:
                 st.success("Login successful!")
                 user_id = response.json().get("user_id")
@@ -62,12 +62,7 @@ else:
     lang = st.sidebar.text_input("Translate summary to (optional)", "")
     output_type = st.sidebar.selectbox("Output Format", ["PDF", "TXT", "DOCX", "HTML", "CSV"])
     # --- Page count input ---
-    page_count = st.sidebar.number_input("How many pages for summary?", min_value=1, max_value=10, value=1, step=1)
 
-    # --- File upload ---
-    pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
-
-    # --- Helper functions ---
     def extract_text_from_pdf(pdf_file):
         all_text = ""
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -90,6 +85,11 @@ else:
                 all_text += text + "\n"
         os.remove(tmp_path)
         return all_text.strip()
+
+    # --- Page count input ---
+    page_count = st.sidebar.number_input("How many pages for summary?", min_value=1, max_value=10, value=1, step=1)
+    # --- File upload ---
+    pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
     def split_text(text, max_words=400):
         words = text.split()
