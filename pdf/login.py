@@ -56,7 +56,8 @@ def login():
 
     if user:
         session['user_id'] = user[0]
-        session['last_interaction'] = datetime.now().isoformat()  # Store as string
+        session['last_interaction'] = datetime.now().isoformat()
+        # Always return valid JSON
         return jsonify({'message': 'Login successful', 'user_id': user[0]}), 200
     else:
         return jsonify({'error': 'Invalid credentials'}), 401
