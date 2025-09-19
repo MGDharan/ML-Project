@@ -10,3 +10,11 @@ pytesseract
 reportlab
 torch==2.2.2
 transformers==4.44.2
+streamlit
+pdfplumber
+transformers
+python-docx
+pdf2image
+pytesseract
+reportlab
+langdetect
