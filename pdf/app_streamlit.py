@@ -39,18 +39,23 @@ if "user_id" not in st.session_state:
         login_name = st.text_input("Name")
         login_password = st.text_input("Password", type="password")
         if st.button("Login"):
-            response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": login_name, "password": login_password})
-            if response.status_code == 200:
-                try:
-                    data = response.json()
-                    user_id = data.get("user_id")
-                    st.success("Login successful!")
-                    st.session_state["user_id"] = user_id
-                    st.rerun()
-                except Exception:
-                    st.error("Login succeeded but response is not valid JSON. Please check your backend.")
-            else:
-                st.error("Invalid credentials.")
+            # Use local Flask backend
+            backend_url = "http://localhost:5000"
+            try:
+                response = requests.post(f"{backend_url}/login", json={"name": login_name, "password": login_password})
+                if response.status_code == 200:
+                    try:
+                        data = response.json()
+                        user_id = data.get("user_id")
+                        st.success("Login successful!")
+                        st.session_state["user_id"] = user_id
+                        st.rerun()
+                    except Exception:
+                        st.error("Login succeeded but response is not valid JSON. Please check your backend.")
+                else:
+                    st.error("Invalid credentials.")
+            except Exception as e:
+                st.error(f"Could not connect to backend: {e}")
 
     show_login()
     st.stop()
@@ -180,13 +185,17 @@ else:
 
     if "user_id" in st.session_state:
         st.sidebar.subheader("Your History")
-        history_response = requests.get(f"https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/history?user_id={st.session_state['user_id']}")
-        if history_response.status_code == 200:
-            user_history = history_response.json().get("history", [])
-            for entry in user_history:
-                st.sidebar.write(f"{entry[0]}: {entry[1]}")
-        else:
-            st.sidebar.error("Failed to load history.")
+        backend_url = "http://localhost:5000"
+        try:
+            history_response = requests.get(f"{backend_url}/history?user_id={st.session_state['user_id']}")
+            if history_response.status_code == 200:
+                user_history = history_response.json().get("history", [])
+                for entry in user_history:
+                    st.sidebar.write(f"{entry[0]}: {entry[1]}")
+            else:
+                st.sidebar.error("Failed to load history.")
+        except Exception as e:
+            st.sidebar.error(f"Could not connect to backend: {e}")
 
     # --- Main logic ---
     if pdf_file:
