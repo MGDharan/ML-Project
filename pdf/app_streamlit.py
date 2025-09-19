@@ -41,10 +41,14 @@ if "user_id" not in st.session_state:
         if st.button("Login"):
             response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": login_name, "password": login_password})
             if response.status_code == 200:
-                st.success("Login successful!")
-                user_id = response.json().get("user_id")
-                st.session_state["user_id"] = user_id
-                st.rerun()
+                try:
+                    data = response.json()
+                    user_id = data.get("user_id")
+                    st.success("Login successful!")
+                    st.session_state["user_id"] = user_id
+                    st.rerun()
+                except Exception:
+                    st.error("Login succeeded but response is not valid JSON. Please check your backend.")
             else:
                 st.error("Invalid credentials.")
 
