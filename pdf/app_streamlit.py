@@ -39,7 +39,7 @@ if "user_id" not in st.session_state:
         login_name = st.text_input("Name")
         login_password = st.text_input("Password", type="password")
         if st.button("Login"):
-            response = requests.post("http://127.0.0.1:5000/login", json={"name": login_name, "password": login_password})
+            response = requests.post("https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/login", json={"name": login_name, "password": login_password})
             if response.status_code == 200:
                 st.success("Login successful!")
                 user_id = response.json().get("user_id")
@@ -176,7 +176,7 @@ else:
 
     if "user_id" in st.session_state:
         st.sidebar.subheader("Your History")
-        history_response = requests.get(f"http://127.0.0.1:5000/history?user_id={st.session_state['user_id']}")
+        history_response = requests.get(f"https://ml-project-al73wyu5prwjlzssksvert.streamlit.app/history?user_id={st.session_state['user_id']}")
         if history_response.status_code == 200:
             user_history = history_response.json().get("history", [])
             for entry in user_history:
