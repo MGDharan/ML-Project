@@ -30,7 +30,7 @@ page_count = st.sidebar.number_input("How many pages for summary?", min_value=1,
 #--- File upload ---
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
---- Helper functions ---
+#--- Helper functions ---
 def extract_text_from_pdf(pdf_file):
 all_text = ""
 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
