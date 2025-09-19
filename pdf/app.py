@@ -11,10 +11,10 @@ from datetime import datetime
 
 st.set_page_config(page_title="AI Document Processor", layout="wide")
 
---- File history CSV ---
-HISTORY_CSV = os.path.join(os.path.dirname(file), "user_history.csv")
+# File history CSV
+HISTORY_CSV = os.path.join(os.path.dirname(__file__), "user_history.csv")
 
---- Sidebar for AI tool selection ---
+# Sidebar for AI tool selection ---
 st.sidebar.header("AI Tools")
 ai_tools = st.sidebar.multiselect(
 "Select AI tools to apply:",
@@ -24,13 +24,13 @@ default=["Text Summarization"]
 lang = st.sidebar.text_input("Translate summary to (optional)", "")
 output_type = st.sidebar.selectbox("Output Format", ["PDF", "TXT", "DOCX", "HTML", "CSV"])
 
---- Page count input ---
+# Page count input ---
 page_count = st.sidebar.number_input("How many pages for summary?", min_value=1, max_value=10, value=1, step=1)
 
---- File upload ---
+# File upload ---
 pdf_file = st.file_uploader("Upload PDF", type=["pdf"])
 
---- Helper functions ---
+# Helper functions ---
 def extract_text_from_pdf(pdf_file):
 all_text = ""
 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -46,7 +46,7 @@ except Exception as e:
 st.warning(f"[Error using pdfplumber: {e}]")
 if not all_text.strip():
 st.info("No selectable text found. Running OCR...")
-poppler_path = os.path.join(os.path.dirname(file), "uploads", "poppler", "bin")
+poppler_path = os.path.join(os.path.dirname(__file__), "uploads", "poppler", "bin")
 images = convert_from_path(tmp_path, poppler_path=poppler_path)
 for img in images:
 text = pytesseract.image_to_string(img, lang="eng")
@@ -136,7 +136,7 @@ with open(HISTORY_CSV, mode="r", encoding="utf-8") as f:
 reader = csv.reader(f)
 return list(reader)
 
---- Main logic ---
+# Main logic ---
 if pdf_file:
 text = extract_text_from_pdf(pdf_file)
 if not text.strip():
@@ -182,7 +182,7 @@ mime=None
 os.remove(file_path)
 log_user_request(ai_tools, output_type, page_count)
 
---- Additional AI Tools (right side) ---
+# Additional AI Tools (right side) ---
 col1, col2 = st.columns([2, 1])
 
 with col1:
@@ -230,11 +230,11 @@ st.write("T5 Summary:", t5_summary)
 except Exception as e:
 st.write(f"T5 summarization error: {e}")
 
---- AI Info Sidebar ---
+# AI Info Sidebar ---
 st.sidebar.markdown("---")
 st.sidebar.markdown("AI Features:\n- Text Summarization\n- Sentiment Analysis\n- Chatbot Integration\n- Document Classification\n- Language Translation")
 
---- Show history ---
+# Show history ---
 st.sidebar.markdown("---")
 st.sidebar.subheader("History")
 history = load_history()
