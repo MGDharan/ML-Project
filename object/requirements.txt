@@ -1,1 +1,8 @@
 Flask>=2.0
+opencv-python
+torch
+ultralytics
+pyttsx3
+requests
+geopy
+
