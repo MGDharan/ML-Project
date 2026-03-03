@@ -1,0 +1,15 @@
+# VS Code
+.vscode/
+.vscode-insiders/
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+env/
+
+# System files
+.DS_Store
+Thumbs.db

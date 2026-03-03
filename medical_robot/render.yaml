@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: quiz-battle-socket
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: DB_NAME
+        value: quiz_battle

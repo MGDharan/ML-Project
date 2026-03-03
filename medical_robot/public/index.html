@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Battle Arena</title>
+  <style>
+    :root {
+      --bg-start: #09141d;
+      --bg-mid: #122435;
+      --bg-end: #183b57;
+      --card: rgba(255, 255, 255, 0.12);
+      --card-border: rgba(255, 255, 255, 0.28);
+      --text: #eef7ff;
+      --muted: #c2d7ea;
+      --accent: #ff8c2a;
+      --accent-2: #23d8a2;
+      --danger: #ff4c6d;
+      --shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 140, 42, 0.18), transparent 42%),
+        radial-gradient(circle at 85% 80%, rgba(35, 216, 162, 0.2), transparent 45%),
+        linear-gradient(140deg, var(--bg-start), var(--bg-mid), var(--bg-end));
+      overflow-x: hidden;
+      perspective: 1000px;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      animation: float 14s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-12vh) translateX(100px) scale(1); opacity: 0; }
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-top: 12px;
+      margin-bottom: 18px;
+      animation: slideIn 700ms ease;
+    }
+
+    .title {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: linear-gradient(120deg, #ffffff, #ffd79c, #95ffe2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .status {
+      position: fixed;
+      right: 14px;
+      top: 14px;
+      z-index: 5;
+      border: 1px solid var(--card-border);
+      background: rgba(0, 0, 0, 0.2);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: #b6ffd8;
+      backdrop-filter: blur(8px);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      margin-top: 14px;
+      transform-style: preserve-3d;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+      animation: cardIn 550ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px) rotateX(4deg);
+      box-shadow: 0 28px 55px rgba(0, 0, 0, 0.42);
+    }
+
+    .grid-2 {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 11px;
+      padding: 12px 13px;
+      color: #072338;
+      background: rgba(255, 255, 255, 0.95);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    button {
+      border: none;
+      border-radius: 11px;
+      padding: 11px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #072338;
+      background: linear-gradient(120deg, #ffd18a, var(--accent));
+      cursor: pointer;
+      transition: transform 150ms ease, filter 150ms ease;
+    }
+
+    button:hover { transform: translateY(-2px); filter: brightness(1.03); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-secondary {
+      color: #053124;
+      background: linear-gradient(120deg, #8ff5d7, var(--accent-2));
+    }
+
+    .btn-danger {
+      color: #ffffff;
+      background: linear-gradient(120deg, #ff7b92, var(--danger));
+    }
+
+    .hidden { display: none !important; }
+
+    .id-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: rgba(0, 0, 0, 0.18);
+      padding: 7px 12px;
+      font-weight: 700;
+      color: #ffd79c;
+    }
+
+    .question {
+      min-height: 90px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      font-weight: 800;
+      padding: 8px;
+      animation: flipIn 300ms ease;
+    }
+
+    .score-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .score-box {
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.16);
+      animation: pop 300ms ease;
+    }
+
+    .score-name { color: var(--muted); font-size: 0.85rem; }
+    .score-value { font-size: 2rem; font-weight: 900; color: #ffe8be; }
+
+    .toast {
+      margin-top: 10px;
+      min-height: 18px;
+      color: #f7ffe3;
+      font-size: 0.9rem;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.62);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      padding: 14px;
+    }
+
+    .modal.show { display: flex; }
+
+    .dialog {
+      width: min(520px, 100%);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      background: linear-gradient(150deg, rgba(11, 33, 48, 0.94), rgba(24, 61, 93, 0.94));
+      padding: 20px;
+      box-shadow: var(--shadow);
+      transform: translateY(8px) rotateX(8deg);
+      animation: modalIn 260ms ease forwards;
+    }
+
+    .dialog h2 { margin-bottom: 8px; }
+    .dialog p { color: var(--muted); }
+
+    @keyframes cardIn {
+      from { transform: translateY(20px) rotateX(12deg); opacity: 0; }
+      to { transform: translateY(0) rotateX(0); opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes flipIn {
+      from { transform: rotateX(65deg); opacity: 0; }
+      to { transform: rotateX(0); opacity: 1; }
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes modalIn {
+      to { transform: translateY(0) rotateX(0); }
+    }
+
+    @media (max-width: 760px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .row button { width: 100%; }
+      .row input { min-width: 0; }
+      .status { top: auto; bottom: 14px; right: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  <div class="status" id="status">Disconnected</div>
+
+  <div class="shell">
+    <header class="hero">
+      <h1 class="title">Quiz Battle Arena</h1>
+      <p class="subtitle">Login once, keep same Player ID forever.</p>
+    </header>
+
+    <section class="card" id="authCard">
+      <h2 style="margin-bottom: 12px;">Login / Register</h2>
+      <div class="grid-2">
+        <div>
+          <div class="label">Email</div>
+          <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div>
+          <div class="label">Password</div>
+          <input id="password" type="password" placeholder="At least 6 characters" autocomplete="current-password">
+        </div>
+      </div>
+      <div class="row" style="margin-top: 12px;">
+        <button id="loginBtn">Login</button>
+        <button class="btn-secondary" id="registerBtn">Register</button>
+      </div>
+      <div class="toast" id="authToast"></div>
+    </section>
+
+    <section class="card hidden" id="gameRoot">
+      <div class="id-strip">
+        <div>
+          <div class="label">Logged in as</div>
+          <div class="pill" id="emailView">-</div>
+        </div>
+        <div>
+          <div class="label">Your Player ID</div>
+          <div class="pill" id="myId">-</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card hidden" id="challengeCard">
+      <h2 style="margin-bottom: 10px;">Challenge Player</h2>
+      <div class="row">
+        <input id="connectId" placeholder="Enter opponent Player ID">
+        <button id="challengeBtn">Send Challenge</button>
+      </div>
+      <div class="toast" id="challengeToast"></div>
+    </section>
+
+    <section class="card hidden" id="gameCard">
+      <h2 style="margin-bottom: 6px;">Current Question</h2>
+      <div class="question" id="question">Waiting for game...</div>
+      <div class="row">
+        <input id="answer" placeholder="Type your answer" disabled>
+        <button id="answerBtn" disabled>Submit</button>
+      </div>
+      <div class="toast" id="answerToast"></div>
+    </section>
+
+    <section class="card hidden" id="scoreCard">
+      <h2 style="margin-bottom: 10px;">Scoreboard</h2>
+      <div class="score-grid" id="scoreContainer">
+        <div class="score-box">
+          <div class="score-name">No score yet</div>
+          <div class="score-value">0</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal" id="requestModal">
+    <div class="dialog">
+      <h2>Battle Request</h2>
+      <p>Player <span id="requestFrom"></span> challenged you.</p>
+      <div class="row" style="margin-top: 14px;">
+        <button id="acceptBtn">Accept</button>
+        <button class="btn-danger" id="declineBtn">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="overModal">
+    <div class="dialog">
+      <h2 id="overTitle">Game Over</h2>
+      <p id="overText"></p>
+      <div class="row" style="margin-top: 14px;">
+        <button id="overClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const particles = document.getElementById("particles");
+    for (let i = 0; i < 45; i += 1) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animationDuration = 10 + Math.random() * 10 + "s";
+      p.style.animationDelay = Math.random() * 8 + "s";
+      particles.appendChild(p);
+    }
+
+    const ui = {
+      status: document.getElementById("status"),
+      authCard: document.getElementById("authCard"),
+      gameRoot: document.getElementById("gameRoot"),
+      challengeCard: document.getElementById("challengeCard"),
+      gameCard: document.getElementById("gameCard"),
+      scoreCard: document.getElementById("scoreCard"),
+      authToast: document.getElementById("authToast"),
+      challengeToast: document.getElementById("challengeToast"),
+      answerToast: document.getElementById("answerToast"),
+      email: document.getElementById("email"),
+      password: document.getElementById("password"),
+      loginBtn: document.getElementById("loginBtn"),
+      registerBtn: document.getElementById("registerBtn"),
+      emailView: document.getElementById("emailView"),
+      myId: document.getElementById("myId"),
+      connectId: document.getElementById("connectId"),
+      challengeBtn: document.getElementById("challengeBtn"),
+      question: document.getElementById("question"),
+      answer: document.getElementById("answer"),
+      answerBtn: document.getElementById("answerBtn"),
+      scoreContainer: document.getElementById("scoreContainer"),
+      requestModal: document.getElementById("requestModal"),
+      requestFrom: document.getElementById("requestFrom"),
+      acceptBtn: document.getElementById("acceptBtn"),
+      declineBtn: document.getElementById("declineBtn"),
+      overModal: document.getElementById("overModal"),
+      overTitle: document.getElementById("overTitle"),
+      overText: document.getElementById("overText"),
+      overClose: document.getElementById("overClose")
+    };
+
+    let socket = null;
+    let me = { email: "", playerId: "" };
+    let pendingFrom = null;
+    let gameId = null;
+
+    function setToast(el, msg, ok = true) {
+      el.style.color = ok ? "#d5ffd0" : "#ffd2d9";
+      el.textContent = msg;
+    }
+
+    function setConnected(connected) {
+      ui.status.textContent = connected ? "Connected" : "Disconnected";
+      ui.status.style.color = connected ? "#b6ffd8" : "#ffd2d9";
+    }
+
+    async function callApi(url, body) {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.error || "Request failed");
+      }
+      return data;
+    }
+
+    function showGameUi() {
+      ui.authCard.classList.add("hidden");
+      ui.gameRoot.classList.remove("hidden");
+      ui.challengeCard.classList.remove("hidden");
+      ui.gameCard.classList.remove("hidden");
+      ui.scoreCard.classList.remove("hidden");
+    }
+
+    function connectSocket(playerId) {
+      if (socket) {
+        socket.disconnect();
+      }
+
+      socket = io({ auth: { playerId } });
+
+      socket.on("connect", () => setConnected(true));
+      socket.on("disconnect", () => setConnected(false));
+
+      socket.on("authError", (msg) => {
+        setToast(ui.authToast, msg || "Authentication failed", false);
+      });
+
+      socket.on("yourId", (id) => {
+        me.playerId = id;
+        ui.myId.textContent = id;
+      });
+
+      socket.on("gameRequest", (fromId) => {
+        pendingFrom = fromId;
+        ui.requestFrom.textContent = fromId;
+        ui.requestModal.classList.add("show");
+      });
+
+      socket.on("startGame", (id) => {
+        gameId = id;
+        ui.answer.disabled = false;
+        ui.answerBtn.disabled = false;
+        ui.question.textContent = "Game started. First question loaded.";
+        setToast(ui.challengeToast, "Match started.", true);
+      });
+
+      socket.on("gameError", (msg) => {
+        setToast(ui.challengeToast, msg || "Game error", false);
+      });
+
+      socket.on("newQuestion", (q) => {
+        ui.question.textContent = q;
+        ui.answer.value = "";
+        ui.answer.focus();
+      });
+
+      socket.on("updateScore", (scores) => {
+        ui.scoreContainer.innerHTML = "";
+        Object.entries(scores).forEach(([playerId, score]) => {
+          const box = document.createElement("div");
+          box.className = "score-box";
+          box.innerHTML = `
+            <div class="score-name">${playerId === me.playerId ? "You" : playerId}</div>
+            <div class="score-value">${score}</div>
+          `;
+          ui.scoreContainer.appendChild(box);
+        });
+      });
+
+      socket.on("gameOver", (scores) => {
+        const myScore = Number(scores[me.playerId] || 0);
+        const other = Object.entries(scores).find(([pid]) => pid !== me.playerId);
+        const oppScore = other ? Number(other[1]) : 0;
+
+        let title = "Game Over";
+        if (myScore > oppScore) title = "Victory";
+        if (myScore < oppScore) title = "Defeat";
+        if (myScore === oppScore) title = "Draw";
+
+        ui.overTitle.textContent = title;
+        ui.overText.textContent = `Final score: ${myScore} - ${oppScore}`;
+        ui.overModal.classList.add("show");
+
+        gameId = null;
+        ui.answer.disabled = true;
+        ui.answerBtn.disabled = true;
+        ui.question.textContent = "Waiting for next game...";
+      });
+    }
+
+    ui.loginBtn.addEventListener("click", async () => {
+      try {
+        const email = ui.email.value.trim();
+        const password = ui.password.value;
+        const data = await callApi("/api/login", { email, password });
+        me = data;
+        ui.emailView.textContent = data.email;
+        ui.myId.textContent = data.playerId;
+        showGameUi();
+        connectSocket(data.playerId);
+        setToast(ui.authToast, `Welcome back. Player ID: ${data.playerId}`);
+      } catch (error) {
+        setToast(ui.authToast, error.message, false);
+      }
+    });
+
+    ui.registerBtn.addEventListener("click", async () => {
+      try {
+        const email = ui.email.value.trim();
+        const password = ui.password.value;
+        const data = await callApi("/api/register", { email, password });
+        me = data;
+        ui.emailView.textContent = data.email;
+        ui.myId.textContent = data.playerId;
+        showGameUi();
+        connectSocket(data.playerId);
+        setToast(ui.authToast, `Registered. Your Player ID is ${data.playerId}`);
+      } catch (error) {
+        setToast(ui.authToast, error.message, false);
+      }
+    });
+
+    ui.challengeBtn.addEventListener("click", () => {
+      const targetId = ui.connectId.value.trim();
+      if (!targetId) {
+        setToast(ui.challengeToast, "Enter opponent Player ID", false);
+        return;
+      }
+      if (!socket || !socket.connected) {
+        setToast(ui.challengeToast, "Socket not connected", false);
+        return;
+      }
+      socket.emit("requestGame", targetId);
+      setToast(ui.challengeToast, "Challenge sent", true);
+    });
+
+    ui.acceptBtn.addEventListener("click", () => {
+      if (!pendingFrom || !socket) {
+        return;
+      }
+      socket.emit("acceptGame", pendingFrom);
+      ui.requestModal.classList.remove("show");
+      pendingFrom = null;
+    });
+
+    ui.declineBtn.addEventListener("click", () => {
+      ui.requestModal.classList.remove("show");
+      pendingFrom = null;
+    });
+
+    ui.answerBtn.addEventListener("click", () => {
+      const answer = ui.answer.value.trim();
+      if (!answer) {
+        setToast(ui.answerToast, "Type an answer", false);
+        return;
+      }
+      if (!gameId) {
+        setToast(ui.answerToast, "No active game", false);
+        return;
+      }
+      socket.emit("answer", { gameId, answer });
+      ui.answer.value = "";
+      setToast(ui.answerToast, "Answer submitted", true);
+    });
+
+    ui.answer.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        ui.answerBtn.click();
+      }
+    });
+
+    ui.overClose.addEventListener("click", () => {
+      ui.overModal.classList.remove("show");
+    });
+  </script>
+</body>
+</html>
